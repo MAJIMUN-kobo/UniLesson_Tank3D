@@ -12,8 +12,8 @@ public class Tank : MonoBehaviour
     public Transform cannon;
 
     [Header("** Shot Settings **")]
-    public Transform shotPoint;         // 총알이 발사되는 위치
-    public GameObject bulletPrefab;     // 발사할 총알 프리팹
+    public Transform shotPoint;         // 撃ちだし座標
+    public GameObject bulletPrefab;     // 弾丸のプレハブ
 
     void Start()
     {
@@ -90,7 +90,7 @@ public class Tank : MonoBehaviour
 
     void Shot()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButton(0))
         {
             // 弾丸を生成する
             GameObject origin   = bulletPrefab;
@@ -100,8 +100,20 @@ public class Tank : MonoBehaviour
             GameObject bullet = Instantiate(origin, position, rotation);
 
             // 弾丸を飛ばす
-            //Rigidbody rb = bullet.GetComponent<Rigidbody>();
-            //rb.AddForce();
+            Rigidbody rb = bullet.GetComponent<Rigidbody>();
+            rb.AddForce(shotPoint.forward * 50, ForceMode.Impulse);
+            
+            Destroy(bullet, 5f);
+        }
+    }
+
+    void OnCollisionEnter( Collision collision )
+    {
+        // "Box"に触れると、タンクが消える（死亡）
+        if (collision.transform.name.Equals("Box"))
+        {
+            Debug.Log($"[ {collision.transform.name} ]に触れました！ゲームオーバー...");
+            Destroy(gameObject);
         }
     }
 }
